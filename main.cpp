@@ -28,11 +28,10 @@ int main(int argc, const char* argv[]) {
 
     if (id != VALID_ID || pw != VALID_PW) {
         std::cout << "Invalid id or password\n";
+        return 0;
     }
     
     std::cout << "Login success. Welcome, " << id << "!\n";
-
-
 
     while (true) {
         std::string line;
