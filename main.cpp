@@ -30,7 +30,7 @@ int main(int argc, const char* argv[]) {
         std::cout << "Invalid id or password\n";
     }
     
-    std::cout << "Login success. Welcome, " << userId << "!\n";
+    std::cout << "Login success. Welcome, " << id << "!\n";
 
 
 
