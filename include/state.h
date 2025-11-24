@@ -14,6 +14,8 @@
 #include <cstdlib>
 #include <sys/stat.h>
 
+#include "include/utils.h"
+
 // ====== 전방 선언 ======
 struct state;
 
@@ -102,7 +104,7 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
     trim(line);
     if (line.empty()) {
         // 빈 줄이면 그냥 다시 idle
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     // 토큰 분리
@@ -114,7 +116,7 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
     }
 
     if (tokens.empty()) {
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     const std::string& command = tokens[0];
@@ -122,17 +124,17 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
     if (command == "upload") {
         if (tokens.size() != 3) {
             std::cout << "Usage: upload <local_path> <remote_path>\n";
-            return std::make_unique<idle_state>();
+            return make_unique<idle_state>();
         }
         // 인자를 가진 상태 객체 생성
-        return std::make_unique<upload_state>(tokens[1], tokens[2]);
+        return make_unique<upload_state>(tokens[1], tokens[2]);
     }
     else if (command == "download") {
         if (tokens.size() != 3) {
             std::cout << "Usage: download <remote_path> <local_path>\n";
-            return std::make_unique<idle_state>();
+            return make_unique<idle_state>();
         }
-        return std::make_unique<download_state>(tokens[1], tokens[2]);
+        return make_unique<download_state>(tokens[1], tokens[2]);
     }
     else if (command == "exit") {
         std::cout << "bye.\n";
@@ -140,7 +142,7 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
     }
     else {
         std::cout << "Invalid command: " << command << "\n";
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 }
 
@@ -153,14 +155,14 @@ inline std::unique_ptr<state> upload_state::handle(context& ctx) {
     int src_fd = ::open(src.c_str(), O_RDONLY);
     if (src_fd < 0) {
         std::perror("fail to open src file");
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     struct stat st{};
     if (::stat(src.c_str(), &st) < 0) {
         std::perror("fail to stat src file");
         ::close(src_fd);
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     int dest_fd = ::open(dest.c_str(),
@@ -169,7 +171,7 @@ inline std::unique_ptr<state> upload_state::handle(context& ctx) {
     if (dest_fd < 0) {
         std::perror("대상 파일 열기 실패");
         ::close(src_fd);
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     char buffer[context::BUF_SIZE];
@@ -183,7 +185,7 @@ inline std::unique_ptr<state> upload_state::handle(context& ctx) {
                 std::perror("fail to write to dest file");
                 ::close(src_fd);
                 ::close(dest_fd);
-                return std::make_unique<idle_state>();
+                return make_unique<idle_state>();
             }
             written += w;
         }
@@ -198,7 +200,7 @@ inline std::unique_ptr<state> upload_state::handle(context& ctx) {
 
     std::cout << "upload success: " << src << " -> " << dest << "\n";
     // 작업 끝나면 다시 idle 상태로
-    return std::make_unique<idle_state>();
+    return make_unique<idle_state>();
 }
 
 // ====== download_state 구현 ======
@@ -210,14 +212,14 @@ inline std::unique_ptr<state> download_state::handle(context& ctx) {
     int src_fd = ::open(src.c_str(), O_RDONLY);
     if (src_fd < 0) {
         std::perror("fail to open remote file");
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     struct stat st{};
     if (::stat(src.c_str(), &st) < 0) {
         std::perror("fail to stat remote file");
         ::close(src_fd);
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     int dest_fd = ::open(dest.c_str(),
@@ -226,7 +228,7 @@ inline std::unique_ptr<state> download_state::handle(context& ctx) {
     if (dest_fd < 0) {
         std::perror("fail to open local dest file");
         ::close(src_fd);
-        return std::make_unique<idle_state>();
+        return make_unique<idle_state>();
     }
 
     char buffer[context::BUF_SIZE];
@@ -240,7 +242,7 @@ inline std::unique_ptr<state> download_state::handle(context& ctx) {
                 std::perror("writing fail");
                 ::close(src_fd);
                 ::close(dest_fd);
-                return std::make_unique<idle_state>();
+                return make_unique<idle_state>();
             }
             written += w;
         }
@@ -254,7 +256,7 @@ inline std::unique_ptr<state> download_state::handle(context& ctx) {
     ::close(dest_fd);
 
     std::cout << "download success: " << src << " -> " << dest << "\n";
-    return std::make_unique<idle_state>();
+    return make_unique<idle_state>();
 }
 
 #endif // CONTROLLERS_H
