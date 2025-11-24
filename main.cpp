@@ -7,6 +7,9 @@
 #define CMD_BUF_SIZE 1024
 
 
+std::string VALID_ID = "user1";
+std::string VALID_PW = "1234";
+
 
 int main(int argc, const char* argv[]) {
 
@@ -14,9 +17,21 @@ int main(int argc, const char* argv[]) {
         std::cout << "use correct id and password" << std::endl;
     }
 
-    if (argv[2] == "--id" && argv[3] == "--password") {
+    std::string argv1 = argv[1];
+    std::string id = argv[2];
+    std::string argv3 = argv[3];
+    std::string pw = argv[4];
 
+    if (argv1 != "--id" || (argv3 != "--pw" && argv3 != "--password")) {
+        std::cout << "Usage: " << argv[0] << " --id <user> --pw <password>\n";
     }
+
+    if (id != VALID_ID || pw != VALID_PW) {
+        std::cout << "Invalid id or password\n";
+        return 0;
+    }
+    
+    std::cout << "Login success. Welcome, " << id << "!\n";
 
     while (true) {
         std::string line;
