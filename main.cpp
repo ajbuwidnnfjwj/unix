@@ -39,7 +39,7 @@ int main(int argc, const char* argv[]) {
     std::cout << "Login success. Welcome, " << id << "!\n";
 
     context ctx(id);
-    std::unique_ptr<state> current = std::make_unique<idle_state>();
+    std::unique_ptr<state> current = make_unique<idle_state>();
 
     while (current) {
         current = current->handle(ctx);
