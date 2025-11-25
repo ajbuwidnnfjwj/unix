@@ -1,9 +1,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <vector>
 
-#include "include/state.h"
+#include "include/states/state.h"
 
 #define STORAGE_DIR "storage"
 #define CMD_BUF_SIZE 1024
@@ -16,6 +15,7 @@ std::string commands[2] = { "upload", "download" };
 
 int main(int argc, const char* argv[]) {
 
+    // login process
     if (argc != 5) {
         std::cout << "use correct id and password" << std::endl;
     }
@@ -28,8 +28,6 @@ int main(int argc, const char* argv[]) {
     if (argv[2] == "--id" && argv[3] == "--password") {
         std::cout << "Usage: " << argv[0] << " --id <user> --pw <password>\n";
     }
-
-    std::cout << "Login success. Welcome, " << id << "!\n";
 
     if (id != VALID_ID || pw != VALID_PW) {
         std::cout << "Invalid id or password\n";
