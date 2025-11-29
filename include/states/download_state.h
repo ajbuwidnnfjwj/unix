@@ -12,9 +12,13 @@
 struct download_state : public state {
     std::string remote_path; // cloud_root 기준 상대 경로
     std::string local_path;
+    std::string password;
 
     download_state(std::string remote, std::string local)
         : remote_path(std::move(remote)), local_path(std::move(local)) {}
+    download_state(std::string remote, std::string local, std::string password)
+        : remote_path(std::move(remote)), local_path(std::move(local)),
+    password(std::move(password)) {}
 
     std::unique_ptr<state> handle(context& ctx) override;
 };
@@ -22,6 +26,15 @@ struct download_state : public state {
 inline std::unique_ptr<state> download_state::handle(context& ctx) {
     const std::string src  = ctx.cloud_root + "/" + remote_path;
     const std::string dest = local_path;
+
+    if (is_locked(src)) {
+        std::string pw;
+        std::cout << "enter password: ";
+        std::cin >> pw;
+        if (!unlock(src, pw)) {
+            return make_unique<idle_state>();
+        }
+    }
 
     int src_fd = ::open(src.c_str(), O_RDONLY);
     if (src_fd < 0) {

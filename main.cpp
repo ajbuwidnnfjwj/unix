@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 
+#include "include/init.h"
 #include "include/states/state.h"
 
 #define STORAGE_DIR "storage"
@@ -34,6 +35,20 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
 
+    global_state = make_unique<struct global_state>();
+    global_state->auth_fd = ::open(".auth", O_RDWR | O_CREAT | O_APPEND, 0600);
+    if (global_state->auth_fd < 0) {
+        perror("open .auth");
+        std::cout << "fail to init program\n";
+        return 0;
+    }
+    global_state->auth_fp = fdopen(global_state->auth_fd, "a+");
+    if (!global_state->auth_fp) {
+        perror("fdopen .auth");
+        std::cout << "fail to init program\n";
+        return 0;
+    }
+
     std::cout << "Login success. Welcome, " << id << "!\n";
 
     context ctx(id);
@@ -42,6 +57,9 @@ int main(int argc, const char* argv[]) {
     while (current) {
         current = current->handle(ctx);
     }
+
+    // clean up auth file
+    fclose(global_state->auth_fp);
 
     return 0;
 }

@@ -8,6 +8,7 @@ add_executable(unix main.cpp
         include/utils.h
         include/states/upload_state.h
         include/states/download_state.h
-        include/states/idle_state.h
+        include/states/locking_state.h
+        include/init.h
 )
 

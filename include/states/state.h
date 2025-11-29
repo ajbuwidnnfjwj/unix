@@ -60,6 +60,7 @@ struct idle_state : public state {
 
 #include "download_state.h"
 #include "upload_state.h"
+#include "locking_state.h"
 
 inline std::unique_ptr<state> idle_state::handle(context& ctx) {
     std::cout << "[pwd: " << ctx.pwd << "] $ ";
@@ -105,6 +106,13 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
         }
         return make_unique<download_state>(tokens[1], tokens[2]);
     }
+    else if (command == "lock") {
+        if (tokens.size() != 3) {
+            std::cout << "Usage: lock <file_name> <pw>\n";
+            return make_unique<idle_state>();
+        }
+        return make_unique<struct locking_state>(tokens[1], tokens[2]);
+    }
     else if (command == "exit") {
         std::cout << "bye.\n";
         return nullptr;
@@ -113,6 +121,7 @@ inline std::unique_ptr<state> idle_state::handle(context& ctx) {
         std::cout << "Invalid command: " << command << "\n";
         return make_unique<idle_state>();
     }
+    return make_unique<idle_state>();
 }
 
 #endif // CONTROLLERS_H
